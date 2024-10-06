@@ -9,12 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import Api from './api.js';
 import Backend from './backend.js';
+import Database from './database.js';
 import Logger from './logger.js';
 class App {
     static run() {
         return __awaiter(this, void 0, void 0, function* () {
             yield Logger.initialize();
             yield Backend.initialize();
+            yield Database.initialize();
             yield Api.initialize();
         });
     }

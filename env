@@ -1,8 +1,8 @@
 SERVER_PORT=6060
 HOST_URL=http://localhost:6060/api
 
-DB_USERNAME=postgresql
-DB_PASSWORD=postgresql
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
 DB=Librarian
 DB_HOST=db
 DB_PORT=5432

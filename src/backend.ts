@@ -1,6 +1,6 @@
 import express, {Express} from 'express'
 import Logger from './logger.js'
-import config from './config.js'
+import config from './configuration/config.js'
 
 export default class Backend {
 	public static instance: Backend

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import express from 'express';
 import Logger from './logger.js';
-import config from './config.js';
+import config from './configuration/config.js';
 export default class Backend {
     constructor(logger) {
         this.logger = logger;

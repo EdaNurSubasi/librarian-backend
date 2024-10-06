@@ -10,15 +10,40 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import express from 'express';
 import Logger from './logger.js';
 import Backend from './backend.js';
+import Database from './database.js';
 export default class Api {
-    constructor(logger) {
+    constructor(logger, database) {
         this.logger = logger;
+        this.database = database;
         this.app = Backend.app;
-        this.app.use(express.json(), (err, req, res, next) => {
-            //res.status(err.status || 500).json({error: err.message})
-        });
-        this.app.get('/control', (req, res) => __awaiter(this, void 0, void 0, function* () {
-            res.sendStatus(200);
+        this.app.use(express.json());
+        // DB table creation
+        this.app.get('/setup/user', (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield this.database.userTableCreate();
+            }
+            catch (error) {
+                logger.log('error', 'Unable to create user table:' + error);
+                res.sendStatus(500);
+            }
+        }));
+        this.app.get('/setup/book', (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield this.database.bookTableCreate();
+            }
+            catch (error) {
+                logger.log('error', 'Unable to create book table:' + error);
+                res.sendStatus(500);
+            }
+        }));
+        this.app.get('/setup/pastpresent', (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield this.database.pastPresentTableCreate();
+            }
+            catch (error) {
+                logger.log('error', 'Unable to create pastpresent table:' + error);
+                res.sendStatus(500);
+            }
         }));
         this.app.get('/', (req, res) => __awaiter(this, void 0, void 0, function* () {
             res.sendStatus(200);
@@ -28,7 +53,8 @@ export default class Api {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.instance) {
                 const logger = Logger.instance;
-                this.instance = new Api(logger);
+                const database = Database.instance;
+                this.instance = new Api(logger, database);
                 this.instance.logger.log('info', `API initialized.`);
             }
             return this.instance;
