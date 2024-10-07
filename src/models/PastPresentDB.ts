@@ -5,8 +5,8 @@ import {sequelizeObject} from '../database'
 
 // Define the PastPresent interface
 export interface PastPresentAttributes {
-	id: number
-	userid: UserAttributes
+	id?: number
+	userid: number
 	bookid: number
 	userscore?: number
 	stillpresent?: boolean

@@ -122,6 +122,62 @@ export default class Api {
 				res.sendStatus(500)
 			}
 		})
+
+		this.app.post('/users/:userId/borrow/:bookId', async (req, res) => {
+			try {
+				const userId = parseInt(req.params.userId)
+				const bookId = parseInt(req.params.bookId)
+
+				let pastPresentData: PastPresentAttributes = await this.database.getPastPresentDataExist(userId, bookId)
+				console.log(pastPresentData)
+				if (!pastPresentData) {
+					let pastPresentDataNew: PastPresentAttributes = {
+						userid: userId,
+						bookid: bookId,
+						stillpresent: true,
+						userscore: 0,
+					}
+
+					pastPresentData = await this.database.createPastPresentData(pastPresentDataNew)
+
+					if (!pastPresentData) {
+						res.status(404).json({error: 'Information can not be added'})
+					} else {
+						res.status(200).json(pastPresentData)
+					}
+				} else {
+					let updatedPastPresentData = await this.database.updatePastPresentDataAsReturn(true, 0, userId, bookId)
+
+					let status = updatedPastPresentData == 0 ? false : true
+
+					if (!status) {
+						res.status(404).json({error: 'Information can not be updated'})
+					} else {
+						pastPresentData.stillpresent = true
+						pastPresentData.userscore = 0
+						res.status(200).json(pastPresentData)
+					}
+				}
+			} catch (error) {
+				this.logger.log('error', 'Unable to create information:' + error)
+				res.sendStatus(500)
+			}
+		})
+
+		this.app.post('/users/:userId/return/:bookId', async (req, res) => {
+			try {
+				const userId = parseInt(req.params.userId)
+				const bookId = parseInt(req.params.bookId)
+				const {score} = req.body
+
+				let updatedPastPresentData = await this.database.updatePastPresentDataAsReturn(false, score, userId, bookId)
+				console.log(updatedPastPresentData)
+				res.status(200).json(updatedPastPresentData == 0 ? false : true)
+			} catch (error) {
+				this.logger.log('error', 'Unable to update information:' + error)
+				res.sendStatus(500)
+			}
+		})
 	}
 
 	private async createSingleUserInfo(pastPresentData: PastPresentAttributes[], user: UserAttributes) {

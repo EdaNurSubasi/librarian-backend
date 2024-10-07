@@ -1,10 +1,10 @@
 import {createBookTableDB, createPastPresentTableDB, createUserTableDB} from './configuration/db_create_config'
 import Logger from './logger'
-import {Sequelize} from 'sequelize'
+import {Sequelize, where} from 'sequelize'
 import {createUserDBObject, User} from './models/UserDB'
 import config from './configuration/config'
 import {Book, createBookDBObject} from './models/BookDB'
-import {createPastPresentDBObject, PastPresent} from './models/PastPresentDB'
+import {createPastPresentDBObject, PastPresent, PastPresentAttributes} from './models/PastPresentDB'
 
 export default class Database {
 	public static instance: Database
@@ -72,16 +72,32 @@ export default class Database {
 		return user
 	}
 
-	async getPastPresentDataByUserId(userId: string) {
-		return await PastPresent.findAll({where: {userid: userId}})
-	}
-
 	async getAllBooks() {
 		return await Book.findAll()
 	}
 
 	async getBook(id: string) {
 		return await Book.findOne({where: {id: id}})
+	}
+
+	async getPastPresentDataByUserId(userId: string) {
+		return await PastPresent.findAll({where: {userid: userId}})
+	}
+
+	async getPastPresentDataExist(userId: number, bookId: number) {
+		return await PastPresent.findOne({where: {userid: userId, bookid: bookId}})
+	}
+
+	async getPastPresentData(bookId: number, stillPresent: boolean) {
+		return await PastPresent.findOne({where: {bookid: bookId, stillpresent: stillPresent}})
+	}
+
+	async createPastPresentData(pastPresentDataNew: PastPresentAttributes) {
+		return await PastPresent.create(pastPresentDataNew)
+	}
+
+	async updatePastPresentDataAsReturn(stillpresent: boolean, userscore: number, userId: number, bookId: number) {
+		return await PastPresent.update({stillpresent, userscore}, {where: {userid: userId, bookid: bookId}})
 	}
 
 	public get pool(): Sequelize {
