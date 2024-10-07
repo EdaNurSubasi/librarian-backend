@@ -1,6 +1,7 @@
 import {UserAttributes} from './UserDB'
 
 export interface UserBookInfo {
+	id: number
 	name: string
 	userscore: number
 	writername?: string
@@ -13,6 +14,10 @@ export interface UserBooks {
 }
 
 export interface SingleUserData {
-	user: UserAttributes
+	id: number
+	name: string
+	address?: string
+	birthdate?: Date
+	picture?: string
 	books: UserBooks
 }

@@ -80,6 +80,10 @@ export default class Database {
 		return await Book.findOne({where: {id: id}})
 	}
 
+	async updateBookScore(bookId: number, score: number) {
+		return await Book.update({score}, {where: {id: bookId}})
+	}
+
 	async getPastPresentDataByUserId(userId: string) {
 		return await PastPresent.findAll({where: {userid: userId}})
 	}
@@ -89,7 +93,7 @@ export default class Database {
 	}
 
 	async getPastPresentData(bookId: number, stillPresent: boolean) {
-		return await PastPresent.findOne({where: {bookid: bookId, stillpresent: stillPresent}})
+		return await PastPresent.findAll({where: {bookid: bookId, stillpresent: stillPresent}})
 	}
 
 	async createPastPresentData(pastPresentDataNew: PastPresentAttributes) {

@@ -5,7 +5,8 @@ import Database from './database'
 import {PastPresentAttributes} from './models/PastPresentDB'
 import {UserAttributes} from './models/UserDB'
 import {SingleUserData, UserBookInfo, UserBooks} from './models/Models'
-import {Book, BookAttributes} from './models/BookDB'
+import {BookAttributes} from './models/BookDB'
+import cors from 'cors'
 
 export default class Api {
 	public static instance: Api
@@ -18,6 +19,12 @@ export default class Api {
 		this.database = database
 		this.app = Backend.app
 
+		this.app.use(
+			cors({
+				origin: 'http://localhost:5000',
+				credentials: true,
+			})
+		)
 		this.app.use(express.json())
 		this.createRequests()
 	}
@@ -123,6 +130,21 @@ export default class Api {
 			}
 		})
 
+		this.app.get('/books/:id/available', async (req, res) => {
+			try {
+				const book = await this.database.getPastPresentData(parseInt(req.params.id), true)
+				console.log(book)
+				if (book && book.length > 0) {
+					res.status(200).json(false)
+				} else {
+					res.status(200).json(true)
+				}
+			} catch (error) {
+				this.logger.log('error', 'Unable to get book:' + error)
+				res.sendStatus(500)
+			}
+		})
+
 		this.app.post('/users/:userId/borrow/:bookId', async (req, res) => {
 			try {
 				const userId = parseInt(req.params.userId)
@@ -171,8 +193,21 @@ export default class Api {
 				const {score} = req.body
 
 				let updatedPastPresentData = await this.database.updatePastPresentDataAsReturn(false, score, userId, bookId)
-				console.log(updatedPastPresentData)
-				res.status(200).json(updatedPastPresentData == 0 ? false : true)
+				let result: boolean = updatedPastPresentData == 0 ? false : true
+
+				if (result) {
+					const pastPresentReturned: PastPresentAttributes[] = await this.database.getPastPresentData(bookId, false)
+
+					let totalScore: number = 0
+					let totalVote: number = 0
+					pastPresentReturned.forEach(element => {
+						totalScore += element.userscore ? element.userscore : 0
+						totalVote += 1
+					})
+					const updatedBookData = await this.database.updateBookScore(bookId, totalScore / totalVote)
+					updatedBookData == 0 ? this.logger.log('info', 'Book score update failed!') : this.logger.log('info', 'Book score updated!')
+				}
+				res.status(200).json(result)
 			} catch (error) {
 				this.logger.log('error', 'Unable to update information:' + error)
 				res.sendStatus(500)
@@ -191,7 +226,11 @@ export default class Api {
 		}
 
 		let singleUserInfo: SingleUserData = {
-			user: user,
+			id: user.id,
+			name: user.name,
+			address: user.address,
+			birthdate: user.birthdate,
+			picture: user.picture,
 			books: userBooks,
 		}
 
@@ -208,6 +247,7 @@ export default class Api {
 			}
 			let book: BookAttributes = await this.database.getBook(data.bookid.toString())
 			let userBook: UserBookInfo = {
+				id: book.id,
 				name: book.name,
 				userscore: data.userscore ? data.userscore : 0,
 				writername: book.writername,
@@ -230,6 +270,7 @@ export default class Api {
 
 			let book: BookAttributes = await this.database.getBook(data.bookid.toString())
 			let userBook: UserBookInfo = {
+				id: book.id,
 				name: book.name,
 				userscore: data.userscore ? data.userscore : 0,
 				writername: book.writername,
