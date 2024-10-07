@@ -1,13 +1,16 @@
-import config from './configuration/config.js'
-import {createBookTableDB, createPastPresentTableDB, createUserTableDB} from './configuration/db_create_config.js'
-import Logger from './logger.js'
+import {createBookTableDB, createPastPresentTableDB, createUserTableDB} from './configuration/db_create_config'
+import Logger from './logger'
 import {Sequelize} from 'sequelize'
+import {createUserDBObject, User} from './models/UserDB'
+import config from './configuration/config'
+import {Book, createBookDBObject} from './models/BookDB'
+import {createPastPresentDBObject, PastPresent} from './models/PastPresentDB'
 
 export default class Database {
 	public static instance: Database
-	public static sequelize: Sequelize
 	private logger: Logger
-	private pool: Sequelize
+
+	private _pool!: Sequelize
 
 	private constructor(logger: Logger) {
 		this.logger = logger
@@ -20,27 +23,32 @@ export default class Database {
 			const logger = Logger.instance
 			this.instance = new Database(logger)
 
-			await this.instance.getDatabase()
+			await this.instance.createDatabaseConnection()
+
+			createUserDBObject()
+			createBookDBObject()
+			createPastPresentDBObject()
 		}
 
 		return this.instance
 	}
 
-	async getDatabase() {
-		if (!this.pool) {
-			this.pool = new Sequelize(config.db, config.db_user, config.db_password, {
-				host: 'localhost',
+	async createDatabaseConnection() {
+		if (!sequelizeObject) {
+			sequelizeObject = new Sequelize(config.db!, config.db_user!, config.db_password!, {
+				host: config.db_host,
 				dialect: 'postgres',
 			})
-			Database.sequelize = this.pool
 		}
 
 		try {
-			await this.pool.authenticate()
+			await sequelizeObject.authenticate()
 			this.logger.log('info', 'Connection has been established successfully.')
 		} catch (error) {
 			this.logger.log('error', 'Unable to connect to the database:' + error)
 		}
+
+		return sequelizeObject
 	}
 
 	async userTableCreate() {
@@ -54,4 +62,34 @@ export default class Database {
 	async pastPresentTableCreate() {
 		await this.pool.query(createPastPresentTableDB.toString())
 	}
+
+	async getAllUsers() {
+		return await User.findAll()
+	}
+
+	async getUser(id: string) {
+		const user = await User.findOne({where: {id: id}})
+		return user
+	}
+
+	async getPastPresentDataByUserId(userId: string) {
+		return await PastPresent.findAll({where: {userid: userId}})
+	}
+
+	async getAllBooks() {
+		return await Book.findAll()
+	}
+
+	async getBook(id: string) {
+		return await Book.findOne({where: {id: id}})
+	}
+
+	public get pool(): Sequelize {
+		return this._pool
+	}
+	public set pool(value: Sequelize) {
+		this._pool = value
+	}
 }
+
+export let sequelizeObject: Sequelize

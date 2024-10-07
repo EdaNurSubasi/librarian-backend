@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,24 +8,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import express from 'express';
-import Logger from './logger.js';
-import config from './configuration/config.js';
-export default class Backend {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const logger_1 = __importDefault(require("./logger"));
+const config_1 = __importDefault(require("./configuration/config"));
+class Backend {
     constructor(logger) {
         this.logger = logger;
-        Backend.app = express();
-        Backend.app.listen(config.port);
-        this.logger.log('info', `Backend started to run in port ${config.port}`);
+        Backend.app = (0, express_1.default)();
+        Backend.app.listen(config_1.default.port);
+        this.logger.log('info', `Backend started to run in port ${config_1.default.port}`);
     }
     static initialize() {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.instance) {
-                const logger = Logger.instance;
+                const logger = logger_1.default.instance;
                 this.instance = new Backend(logger);
             }
             return this.instance;
         });
     }
 }
-//# sourceMappingURL=backend.js.map
+exports.default = Backend;

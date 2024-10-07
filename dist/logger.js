@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,10 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { pino } from 'pino';
-export default class Logger {
+Object.defineProperty(exports, "__esModule", { value: true });
+const pino_1 = require("pino");
+class Logger {
     constructor() {
-        this.logInstance = pino({
+        this.logInstance = (0, pino_1.pino)({
             transport: {
                 target: 'pino-pretty',
                 options: {
@@ -47,4 +49,4 @@ export default class Logger {
         }
     }
 }
-//# sourceMappingURL=logger.js.map
+exports.default = Logger;

@@ -1,7 +1,7 @@
-import Api from './api.js'
-import Backend from './backend.js'
-import Database from './database.js'
-import Logger from './logger.js'
+import Api from './api'
+import Backend from './backend'
+import Database from './database'
+import Logger from './logger'
 
 class App {
 	public static async run() {
