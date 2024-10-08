@@ -19,6 +19,15 @@ Project installation steps, explained down below.
   $ cd librarian-backend
   $ docker-compose up -d # This command creates and downloads postgresql. Then runs it. 
 ```
+
+### Database Tables
+
+Database table creation sql commands is given down below. You can use them to create essential tables for application.
+
+	'CREATE TABLE users(id SERIAL NOT NULL PRIMARY KEY, name VARCHAR(255) NOT NULL, address VARCHAR(255) NULL, birthDate TIMESTAMP NULL, picture VARCHAR(255) NULL)'
+	'CREATE TABLE books(id SERIAL NOT NULL PRIMARY KEY, name VARCHAR(255) NOT NULL, score FLOAT NULL, publishedDate TIMESTAMP NULL, writerName VARCHAR(255) NULL, picture VARCHAR(255) NULL)'
+	'CREATE TABLE pastpresentdata(id SERIAL NOT NULL PRIMARY KEY, userId INT NOT NULL, bookId INT NOT NULL, userScore INT NULL, stillPresent BOOLEAN NULL, FOREIGN KEY (userId) REFERENCES users(id), FOREIGN KEY (bookId) REFERENCES books(id))'
+
 ## How To Configure Project
 
 In the project folder, rename 'env' file to '.env'.
