@@ -13,7 +13,12 @@ Project installation steps, explained down below.
   $ cd librarian-backend
   $ npm install --force
 ```
+## How To Configure Database
 
+```
+  $ cd librarian-backend
+  $ docker-compose up -d # This command creates and downloads postgresql. Then runs it. 
+```
 ## How To Configure Project
 
 In the project folder, rename 'env' file to '.env'.
